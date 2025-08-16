@@ -406,13 +406,16 @@ async def save_channel(message: types.Message, state):
     ch_type = data.get("ch_type")
 
     link = message.text.strip()
-    if not link.startswith("http"):
-        return await message.answer("❌ To‘g‘ri kanal havolasini yuboring!")
+
+    # Agar havola yuborsa, faqat username yoki ID ajratib olish
+    if "t.me/" in link:
+        link = link.split("t.me/")[-1].replace("+", "").replace("/", "")
+        if not link.startswith("@") and not link.startswith("-100"):
+            link = f"@{link}"
 
     await add_channel(link, ch_type)
     await message.answer(f"✅ Kanal qo‘shildi: {link} ({ch_type})")
     await state.finish()
-
 
 # === Kanal o‘chirish state ===
 @dp.message_handler(state=ChannelStates.waiting_for_delete)
